@@ -1,7 +1,9 @@
-const {ReactDraggable: Draggable, React, ReactDOM} = window;
+import * as React from "react";
+import Draggable from '../lib/Draggable'
+import "./example.css"
 
-class App extends React.Component {
-  state = {
+const ExampleDraggable = (props) => {
+  const [state, setState] = React.useState({
     activeDrags: 0,
     deltaPosition: {
       x: 0, y: 0
@@ -9,74 +11,92 @@ class App extends React.Component {
     controlledPosition: {
       x: -400, y: 200
     }
-  };
+  })
 
-  handleDrag = (e, ui) => {
-    const {x, y} = this.state.deltaPosition;
-    this.setState({
+  const handleDrag = (e, ui) => {
+    const {x, y} = state.deltaPosition;
+    setState(prevState => ({
+      ...prevState,
       deltaPosition: {
         x: x + ui.deltaX,
         y: y + ui.deltaY,
       }
-    });
+    }));
   };
 
-  onStart = () => {
-    this.setState({activeDrags: ++this.state.activeDrags});
+  const onStart = () => {
+    setState(prevState => ({
+      ...prevState,
+      activeDrags: ++state.activeDrags
+    }));
   };
 
-  onStop = () => {
-    this.setState({activeDrags: --this.state.activeDrags});
+  const onStop = () => {
+    setState(prevState => ({
+      ...prevState,
+      activeDrags: --state.activeDrags
+    }));
   };
-  onDrop = (e) => {
-    this.setState({activeDrags: --this.state.activeDrags});
+  const onDrop = (e) => {
+    setState(prevState => ({
+      ...prevState,
+      activeDrags: --state.activeDrags
+    }));
     if (e.target.classList.contains("drop-target")) {
       alert("Dropped!");
       e.target.classList.remove('hovered');
     }
   };
-  onDropAreaMouseEnter = (e) => {
-    if (this.state.activeDrags) {
+  const onDropAreaMouseEnter = (e) => {
+    if (state.activeDrags) {
       e.target.classList.add('hovered');
     }
   }
-  onDropAreaMouseLeave = (e) => {
+  const onDropAreaMouseLeave = (e) => {
     e.target.classList.remove('hovered');
   }
 
   // For controlled component
-  adjustXPos = (e) => {
+  const adjustXPos = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const {x, y} = this.state.controlledPosition;
-    this.setState({controlledPosition: {x: x - 10, y}});
+    const {x, y} = state.controlledPosition;
+    setState(prevState => ({
+      ...prevState,
+      controlledPosition: {x: x - 10, y}
+    }));
   };
 
-  adjustYPos = (e) => {
+  const adjustYPos = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const {controlledPosition} = this.state;
+    const {controlledPosition} = state;
     const {x, y} = controlledPosition;
-    this.setState({controlledPosition: {x, y: y - 10}});
+    setState(prevState => ({
+      ...prevState,
+      controlledPosition: {x, y: y - 10}
+    }));
   };
 
-  onControlledDrag = (e, position) => {
+  const onControlledDrag = (e, position) => {
     const {x, y} = position;
-    this.setState({controlledPosition: {x, y}});
+    setState(prevState => ({
+      ...prevState,
+      controlledPosition: {x, y}
+    }));
   };
 
-  onControlledDragStop = (e, position) => {
-    this.onControlledDrag(e, position);
-    this.onStop();
+  const onControlledDragStop = (e, position) => {
+    onControlledDrag(e, position);
+    onStop();
   };
 
-  render() {
-    const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
-    const {deltaPosition, controlledPosition} = this.state;
+    const dragHandlers = {onStart: onStart, onStop: onStop};
+    const {deltaPosition, controlledPosition} = state;
     return (
       <div>
         <h1>React Draggable</h1>
-        <p>Active DragHandlers: {this.state.activeDrags}</p>
+        <p>Active DragHandlers: {state.activeDrags}</p>
         <p>
           <a href="https://github.com/STRML/react-draggable/blob/master/example/example.js">Demo Source</a>
         </p>
@@ -92,7 +112,7 @@ class App extends React.Component {
         <Draggable onStart={() => false}>
           <div className="box">I don't want to be dragged</div>
         </Draggable>
-        <Draggable onDrag={this.handleDrag} {...dragHandlers}>
+        <Draggable onDrag={handleDrag} {...dragHandlers}>
           <div className="box">
             <div>I track my deltas</div>
             <div>x: {deltaPosition.x.toFixed(0)}, y: {deltaPosition.y.toFixed(0)}</div>
@@ -131,10 +151,10 @@ class App extends React.Component {
           <div className="box">I can only be moved 100px in any direction.</div>
         </Draggable>
         <Draggable {...dragHandlers}>
-          <div className="box drop-target" onMouseEnter={this.onDropAreaMouseEnter} onMouseLeave={this.onDropAreaMouseLeave}>I can detect drops from the next box.</div>
+          <div className="box drop-target" onMouseEnter={onDropAreaMouseEnter} onMouseLeave={onDropAreaMouseLeave}>I can detect drops from the next box.</div>
         </Draggable>
-        <Draggable {...dragHandlers} onStop={this.onDrop}>
-          <div className={`box ${this.state.activeDrags ? "no-pointer-events" : ""}`}>I can be dropped onto another box.</div>
+        <Draggable {...dragHandlers} onStop={onDrop}>
+          <div className={`box ${state.activeDrags ? "no-pointer-events" : ""}`}>I can be dropped onto another box.</div>
         </Draggable>
         <div className="box" style={{height: '500px', width: '500px', position: 'relative', overflow: 'auto', padding: '0'}}>
           <div style={{height: '1000px', width: '1000px', padding: '10px'}}>
@@ -182,37 +202,36 @@ class App extends React.Component {
             {'I have a default position based on percents {x: \'-10%\', y: \'-10%\'}, so I\'m slightly offset.'}
           </div>
         </Draggable>
-        <Draggable position={controlledPosition} {...dragHandlers} onDrag={this.onControlledDrag}>
+        <Draggable position={controlledPosition} {...dragHandlers} onDrag={onControlledDrag}>
           <div className="box">
             My position can be changed programmatically. <br />
             I have a drag handler to sync state.
             <div>
-              <a href="#" onClick={this.adjustXPos}>Adjust x ({controlledPosition.x})</a>
+              <a href="#" onClick={adjustXPos}>Adjust x ({controlledPosition.x})</a>
             </div>
             <div>
-              <a href="#" onClick={this.adjustYPos}>Adjust y ({controlledPosition.y})</a>
+              <a href="#" onClick={adjustYPos}>Adjust y ({controlledPosition.y})</a>
             </div>
           </div>
         </Draggable>
-        <Draggable position={controlledPosition} {...dragHandlers} onStop={this.onControlledDragStop}>
+        <Draggable position={controlledPosition} {...dragHandlers} onStop={onControlledDragStop}>
           <div className="box">
             My position can be changed programmatically. <br />
             I have a dragStop handler to sync state.
             <div>
-              <a href="#" onClick={this.adjustXPos}>Adjust x ({controlledPosition.x})</a>
+              <a href="#" onClick={adjustXPos}>Adjust x ({controlledPosition.x})</a>
             </div>
             <div>
-              <a href="#" onClick={this.adjustYPos}>Adjust y ({controlledPosition.y})</a>
+              <a href="#" onClick={adjustYPos}>Adjust y ({controlledPosition.y})</a>
             </div>
           </div>
         </Draggable>
 
       </div>
     );
-  }
 }
 
-class RemWrapper extends React.Component {
+const RemWrapper = (props) => {
   // PropTypes is not available in this environment, but here they are.
   // static propTypes = {
   //   style: PropTypes.shape({
@@ -222,7 +241,7 @@ class RemWrapper extends React.Component {
   //   remBaseline: PropTypes.number,
   // }
 
-  translateTransformToRem(transform, remBaseline = 16) {
+  const translateTransformToRem = (transform, remBaseline = 16) => {
     const convertedValues = transform.replace('translate(', '').replace(')', '')
       .split(',')
       .map(px => px.replace('px', ''))
@@ -233,23 +252,21 @@ class RemWrapper extends React.Component {
     return `translate(${x}, ${y})`
   }
 
-  render() {
-    const { children, remBaseline = 16, style } = this.props
+    const { children, remBaseline = 16, style } = props
     const child = React.Children.only(children)
 
     const editedStyle = {
       ...child.props.style,
       ...style,
-      transform: this.translateTransformToRem(style.transform, remBaseline),
+      transform: translateTransformToRem(style.transform, remBaseline),
     }
 
     return React.cloneElement(child, {
        ...child.props,
-       ...this.props,
+       ...props,
        style: editedStyle
     })
-  }
 }
 
 
-ReactDOM.render(<App/>, document.getElementById('container'));
+export default ExampleDraggable

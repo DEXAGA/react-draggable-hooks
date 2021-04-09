@@ -7,22 +7,20 @@ import {createCSSTransform, createSVGTransform} from './utils/domFns';
 import {canDragX, canDragY, createDraggableData, getBoundPosition} from './utils/positionFns';
 import {dontSetMe} from './utils/shims';
 import DraggableCore from './DraggableCore';
-import type {ControlPosition, PositionOffsetControlPosition, DraggableCoreProps, DraggableCoreDefaultProps} from './DraggableCore';
+import {ControlPosition, PositionOffsetControlPosition, DraggableCoreProps, DraggableCoreDefaultProps} from './DraggableCore';
 import log from './utils/log';
-import type {Bounds, DraggableEventHandler} from './utils/types';
-import type {Element as ReactElement} from 'react';
+import {Bounds, DraggableEventHandler} from './utils/types';
 
 type DraggableState = {
-  dragging: boolean,
-  dragged: boolean,
+  dragging?: boolean,
+  dragged?: boolean,
   x: number, y: number,
-  slackX: number, slackY: number,
-  isElementSVG: boolean,
-  prevPropsPosition: ?ControlPosition,
+  slackX?: number, slackY?: number,
+  isElementSVG?: boolean,
+  prevPropsPosition?: ControlPosition,
 };
 
-export type DraggableDefaultProps = {
-  ...DraggableCoreDefaultProps,
+export type DraggableDefaultProps = DraggableCoreDefaultProps & {
   axis: 'both' | 'x' | 'y' | 'none',
   bounds: Bounds | string | false,
   defaultClassName: string,
@@ -32,9 +30,7 @@ export type DraggableDefaultProps = {
   scale: number,
 };
 
-export type DraggableProps = {
-  ...DraggableCoreProps,
-  ...DraggableDefaultProps,
+export type DraggableProps = DraggableCoreProps & DraggableDefaultProps & {
   positionOffset: PositionOffsetControlPosition,
   position: ControlPosition,
 };
@@ -45,7 +41,7 @@ export type DraggableProps = {
 
 class Draggable extends React.Component<DraggableProps, DraggableState> {
 
-  static displayName: ?string = 'Draggable';
+  static displayName: string = 'Draggable';
 
   static propTypes = {
     // Accepts all props <DraggableCore> accepts.
@@ -179,7 +175,7 @@ class Draggable extends React.Component<DraggableProps, DraggableState> {
 
   // React 16.3+
   // Arity (props, state)
-  static getDerivedStateFromProps({position}: DraggableProps, {prevPropsPosition}: DraggableState): ?$Shape<DraggableState> {
+  static getDerivedStateFromProps({position}: DraggableProps, {prevPropsPosition}: DraggableState) {
     // Set x/y if a new position is provided in props that is different than the previous.
     if (
       position &&
@@ -241,7 +237,7 @@ class Draggable extends React.Component<DraggableProps, DraggableState> {
 
   // React Strict Mode compatibility: if `nodeRef` is passed, we will use it instead of trying to find
   // the underlying DOM node ourselves. See the README for more information.
-  findDOMNode(): ?HTMLElement {
+  findDOMNode(): HTMLElement {
     return this.props?.nodeRef?.current ?? ReactDOM.findDOMNode(this);
   }
 
@@ -262,7 +258,7 @@ class Draggable extends React.Component<DraggableProps, DraggableState> {
 
     const uiData = createDraggableData(this, coreData);
 
-    const newState: $Shape<DraggableState> = {
+    const newState: DraggableState = {
       x: uiData.x,
       y: uiData.y
     };
@@ -310,7 +306,7 @@ class Draggable extends React.Component<DraggableProps, DraggableState> {
 
     log('Draggable: onDragStop: %j', coreData);
 
-    const newState: $Shape<DraggableState> = {
+    const newState: DraggableState = {
       dragging: false,
       slackX: 0,
       slackY: 0
@@ -328,7 +324,7 @@ class Draggable extends React.Component<DraggableProps, DraggableState> {
     this.setState(newState);
   };
 
-  render(): ReactElement<any> {
+  render() {
     const {
       axis,
       bounds,

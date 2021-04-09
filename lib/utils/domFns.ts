@@ -2,7 +2,7 @@
 import {findInArray, isFunction, int} from './shims';
 import browserPrefix, {browserPrefixToKey} from './getPrefix';
 
-import type {ControlPosition, PositionOffsetControlPosition, MouseTouchEvent} from './types';
+import {ControlPosition, PositionOffsetControlPosition, MouseTouchEvent} from './types';
 
 let matchesSelectorFunc = '';
 export function matchesSelector(el: Node, selector: string): boolean {
@@ -39,7 +39,7 @@ export function matchesSelectorAndParentsTo(el: Node, selector: string, baseNode
   return false;
 }
 
-export function addEvent(el: ?Node, event: string, handler: Function, inputOptions?: Object): void {
+export function addEvent(el: Node, event: string, handler: Function, inputOptions?: Object): void {
   if (!el) return;
   const options = {capture: true, ...inputOptions};
   if (el.addEventListener) {
@@ -52,7 +52,7 @@ export function addEvent(el: ?Node, event: string, handler: Function, inputOptio
   }
 }
 
-export function removeEvent(el: ?Node, event: string, handler: Function, inputOptions?: Object): void {
+export function removeEvent(el: Node, event: string, handler: Function, inputOptions?: Object): void {
   if (!el) return;
   const options = {capture: true, ...inputOptions};
   if (el.removeEventListener) {
@@ -101,7 +101,7 @@ export function innerWidth(node: HTMLElement): number {
 }
 
 // Get from offsetParent
-export function offsetXYFromParent(evt: {clientX: number, clientY: number, ...}, offsetParent: HTMLElement, scale: number): ControlPosition {
+export function offsetXYFromParent(evt: {clientX: number, clientY: number}, offsetParent: HTMLElement, scale: number): ControlPosition {
   const isBody = offsetParent === offsetParent.ownerDocument.body;
   const offsetParentRect = isBody ? {left: 0, top: 0} : offsetParent.getBoundingClientRect();
 
@@ -130,12 +130,12 @@ export function getTranslation({x, y}: ControlPosition, positionOffset: Position
   return translation;
 }
 
-export function getTouch(e: MouseTouchEvent, identifier: number): ?{clientX: number, clientY: number} {
+export function getTouch(e: MouseTouchEvent, identifier: number): {clientX: number, clientY: number} {
   return (e.targetTouches && findInArray(e.targetTouches, t => identifier === t.identifier)) ||
          (e.changedTouches && findInArray(e.changedTouches, t => identifier === t.identifier));
 }
 
-export function getTouchIdentifier(e: MouseTouchEvent): ?number {
+export function getTouchIdentifier(e: MouseTouchEvent): number {
   if (e.targetTouches && e.targetTouches[0]) return e.targetTouches[0].identifier;
   if (e.changedTouches && e.changedTouches[0]) return e.changedTouches[0].identifier;
 }
@@ -145,7 +145,7 @@ export function getTouchIdentifier(e: MouseTouchEvent): ?number {
 // Useful for preventing blue highlights all over everything when dragging.
 
 // Note we're passing `document` b/c we could be iframed
-export function addUserSelectStyles(doc: ?Document) {
+export function addUserSelectStyles(doc: Document) {
   if (!doc) return;
   let styleEl = doc.getElementById('react-draggable-style-el');
   if (!styleEl) {
@@ -159,7 +159,7 @@ export function addUserSelectStyles(doc: ?Document) {
   if (doc.body) addClassName(doc.body, 'react-draggable-transparent-selection');
 }
 
-export function removeUserSelectStyles(doc: ?Document) {
+export function removeUserSelectStyles(doc: Document) {
   if (!doc) return;
   try {
     if (doc.body) removeClassName(doc.body, 'react-draggable-transparent-selection');

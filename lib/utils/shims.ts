@@ -6,11 +6,11 @@ export function findInArray(array: Array<any> | TouchList, callback: Function): 
   }
 }
 
-export function isFunction(func: any): boolean %checks {
+export function isFunction(func: any): boolean {
   return typeof func === 'function' || Object.prototype.toString.call(func) === '[object Function]';
 }
 
-export function isNum(num: any): boolean %checks {
+export function isNum(num: any): boolean {
   return typeof num === 'number' && !isNaN(num);
 }
 
@@ -18,7 +18,7 @@ export function int(a: string): number {
   return parseInt(a, 10);
 }
 
-export function dontSetMe(props: Object, propName: string, componentName: string): ?Error {
+export function dontSetMe(props: Object, propName: string, componentName: string): Error {
   if (props[propName]) {
     return new Error(`Invalid prop ${propName} passed to ${componentName} - do not set this, set it on the child.`);
   }

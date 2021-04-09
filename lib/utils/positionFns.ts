@@ -1,4 +1,3 @@
-// @flow
 import {isNum, int} from './shims';
 import {getTouch, innerWidth, innerHeight, offsetXYFromParent, outerWidth, outerHeight} from './domFns';
 
@@ -67,7 +66,7 @@ export function canDragY(draggable: Draggable): boolean {
 }
 
 // Get {x, y} positions from event.
-export function getControlPosition(e: MouseTouchEvent, touchIdentifier: ?number, draggableCore: DraggableCore): ?ControlPosition {
+export function getControlPosition(e: MouseTouchEvent, touchIdentifier: number, draggableCore: DraggableCore): ControlPosition {
   const touchObj = typeof touchIdentifier === 'number' ? getTouch(e, touchIdentifier) : null;
   if (typeof touchIdentifier === 'number' && !touchObj) return null; // not the right touch
   const node = findDOMNode(draggableCore);

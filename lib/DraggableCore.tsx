@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
@@ -8,8 +7,7 @@ import {createCoreData, getControlPosition, snapToGrid} from './utils/positionFn
 import {dontSetMe} from './utils/shims';
 import log from './utils/log';
 
-import type {EventHandler, MouseTouchEvent} from './utils/types';
-import type {Element as ReactElement} from 'react';
+import {EventHandler, MouseTouchEvent} from './utils/types';
 
 // Simple abstraction for dragging events names.
 const eventsFor = {
@@ -32,7 +30,7 @@ type DraggableCoreState = {
   dragging: boolean,
   lastX: number,
   lastY: number,
-  touchIdentifier: ?number
+  touchIdentifier: number
 };
 
 export type DraggableData = {
@@ -58,14 +56,13 @@ export type DraggableCoreDefaultProps = {
   scale: number,
 };
 
-export type DraggableCoreProps = {
-  ...DraggableCoreDefaultProps,
+export type DraggableCoreProps = DraggableCoreDefaultProps & {
   cancel: string,
-  children: ReactElement<any>,
+  children: React.Element<any>,
   offsetParent: HTMLElement,
   grid: [number, number],
   handle: string,
-  nodeRef?: ?React.ElementRef<any>,
+  nodeRef?: React.ElementRef<any>,
 };
 
 //
@@ -77,7 +74,7 @@ export type DraggableCoreProps = {
 
 export default class DraggableCore extends React.Component<DraggableCoreProps, DraggableCoreState> {
 
-  static displayName: ?string = 'DraggableCore';
+  static displayName: string = 'DraggableCore';
 
   static propTypes = {
     /**
@@ -105,7 +102,7 @@ export default class DraggableCore extends React.Component<DraggableCoreProps, D
      * `offsetParent`, if set, uses the passed DOM node to compute drag offsets
      * instead of using the parent node.
      */
-    offsetParent: function(props: DraggableCoreProps, propName: $Keys<DraggableCoreProps>) {
+    offsetParent: function(props: DraggableCoreProps, propName: keyof DraggableCoreProps) {
       if (props[propName] && props[propName].nodeType !== 1) {
         throw new Error('Draggable\'s offsetParent must be a DOM Node.');
       }
@@ -264,7 +261,7 @@ export default class DraggableCore extends React.Component<DraggableCoreProps, D
 
   // React Strict Mode compatibility: if `nodeRef` is passed, we will use it instead of trying to find
   // the underlying DOM node ourselves. See the README for more information.
-  findDOMNode(): ?HTMLElement {
+  findDOMNode(): HTMLElement {
     return this.props?.nodeRef?.current ?? ReactDOM.findDOMNode(this);
   }
 
@@ -363,7 +360,7 @@ export default class DraggableCore extends React.Component<DraggableCoreProps, D
         this.handleDragStop(new MouseEvent('mouseup'));
       } catch (err) {
         // Old browsers
-        const event = ((document.createEvent('MouseEvents'): any): MouseTouchEvent);
+        const event = document.createEvent('MouseEvents');
         // I see why this insanity was deprecated
         // $FlowIgnore
         event.initMouseEvent('mouseup', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
@@ -440,7 +437,7 @@ export default class DraggableCore extends React.Component<DraggableCoreProps, D
     return this.handleDragStop(e);
   };
 
-  render(): React.Element<any> {
+  render() {
     // Reuse the child provided
     // This makes it flexible to use whatever element is wanted (div, ul, etc)
     return React.cloneElement(React.Children.only(this.props.children), {
