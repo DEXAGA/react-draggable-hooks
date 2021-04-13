@@ -1,8 +1,7 @@
 {
-  "name": "react-draggable",
-  "version": "4.4.3",
+  "name": "react-draggable-hooks",
+  "version": "0.1.0",
   "description": "React draggable component",
-  "main": "build/cjs/cjs.js",
   "unpkg": "build/web/react-draggable.min.js",
   "scripts": {
     "test": "make test",
@@ -14,7 +13,7 @@
     "build": "make clean build",
     "lint": "make lint",
     "flow": "flow",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "start-storybook -p 6008",
     "build-storybook": "build-storybook"
   },
   "files": [

@@ -14,7 +14,7 @@ import {Bounds, DraggableEventHandler} from './utils/types';
 type DraggableState = {
   dragging?: boolean,
   dragged?: boolean,
-  x: number, y: number,
+  x?: number, y?: number,
   slackX?: number, slackY?: number,
   isElementSVG?: boolean,
   prevPropsPosition?: ControlPosition,
@@ -33,13 +33,14 @@ export type DraggableDefaultProps = DraggableCoreDefaultProps & {
 export type DraggableProps = DraggableCoreProps & DraggableDefaultProps & {
   positionOffset: PositionOffsetControlPosition,
   position: ControlPosition,
+  children: JSX.Element
 };
 
 //
 // Define <Draggable>
 //
 
-class Draggable extends React.Component<DraggableProps, DraggableState> {
+class Draggable extends React.Component<DraggableProps | any, DraggableState> {
 
   static displayName: string = 'Draggable';
 
@@ -238,6 +239,7 @@ class Draggable extends React.Component<DraggableProps, DraggableState> {
   // React Strict Mode compatibility: if `nodeRef` is passed, we will use it instead of trying to find
   // the underlying DOM node ourselves. See the README for more information.
   findDOMNode(): HTMLElement {
+    // @ts-ignore
     return this.props?.nodeRef?.current ?? ReactDOM.findDOMNode(this);
   }
 
@@ -371,18 +373,21 @@ class Draggable extends React.Component<DraggableProps, DraggableState> {
     }
 
     // Mark with class while dragging
-    const className = classNames((children.props.className || ''), defaultClassName, {
+    let children2 = children as any;
+    const className = classNames((children2.props.className || ''), defaultClassName, {
       [defaultClassNameDragging]: this.state.dragging,
       [defaultClassNameDragged]: this.state.dragged
     });
 
     // Reuse the child provided
     // This makes it flexible to use whatever element is wanted (div, ul, etc)
+    let element = React.Children.only(children) as any;
+    let children1 = children as any;
     return (
       <DraggableCore {...draggableCoreProps} onStart={this.onDragStart} onDrag={this.onDrag} onStop={this.onDragStop}>
-        {React.cloneElement(React.Children.only(children), {
+        {React.cloneElement(element, {
           className: className,
-          style: {...children.props.style, ...style},
+          style: {...children1.props.style, ...style},
           transform: svgTransform
         })}
       </DraggableCore>

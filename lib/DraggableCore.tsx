@@ -58,7 +58,7 @@ export type DraggableCoreDefaultProps = {
 
 export type DraggableCoreProps = DraggableCoreDefaultProps & {
   cancel: string,
-  children: React.Element<any>,
+  children: JSX.Element,
   offsetParent: HTMLElement,
   grid: [number, number],
   handle: string,
@@ -72,7 +72,7 @@ export type DraggableCoreProps = DraggableCoreDefaultProps & {
 // work well with libraries that require more control over the element.
 //
 
-export default class DraggableCore extends React.Component<DraggableCoreProps, DraggableCoreState> {
+export default class DraggableCore extends React.Component<DraggableCoreProps | any, DraggableCoreState> {
 
   static displayName: string = 'DraggableCore';
 
@@ -103,6 +103,7 @@ export default class DraggableCore extends React.Component<DraggableCoreProps, D
      * instead of using the parent node.
      */
     offsetParent: function(props: DraggableCoreProps, propName: keyof DraggableCoreProps) {
+      // @ts-ignore
       if (props[propName] && props[propName].nodeType !== 1) {
         throw new Error('Draggable\'s offsetParent must be a DOM Node.');
       }
@@ -262,6 +263,7 @@ export default class DraggableCore extends React.Component<DraggableCoreProps, D
   // React Strict Mode compatibility: if `nodeRef` is passed, we will use it instead of trying to find
   // the underlying DOM node ourselves. See the README for more information.
   findDOMNode(): HTMLElement {
+    // @ts-ignore
     return this.props?.nodeRef?.current ?? ReactDOM.findDOMNode(this);
   }
 
@@ -343,7 +345,8 @@ export default class DraggableCore extends React.Component<DraggableCoreProps, D
     // Snap to grid if prop has been provided
     if (Array.isArray(this.props.grid)) {
       let deltaX = x - this.state.lastX, deltaY = y - this.state.lastY;
-      [deltaX, deltaY] = snapToGrid(this.props.grid, deltaX, deltaY);
+      let grid = this.props.grid as any;
+      [deltaX, deltaY] = snapToGrid(grid, deltaX, deltaY);
       if (!deltaX && !deltaY) return; // skip useless drag
       x = this.state.lastX + deltaX, y = this.state.lastY + deltaY;
     }
@@ -357,6 +360,7 @@ export default class DraggableCore extends React.Component<DraggableCoreProps, D
     if (shouldUpdate === false || this.mounted === false) {
       try {
         // $FlowIgnore
+        // @ts-ignore
         this.handleDragStop(new MouseEvent('mouseup'));
       } catch (err) {
         // Old browsers
@@ -364,6 +368,7 @@ export default class DraggableCore extends React.Component<DraggableCoreProps, D
         // I see why this insanity was deprecated
         // $FlowIgnore
         event.initMouseEvent('mouseup', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        // @ts-ignore
         this.handleDragStop(event);
       }
       return;
@@ -440,6 +445,7 @@ export default class DraggableCore extends React.Component<DraggableCoreProps, D
   render() {
     // Reuse the child provided
     // This makes it flexible to use whatever element is wanted (div, ul, etc)
+    // @ts-ignore
     return React.cloneElement(React.Children.only(this.props.children), {
       // Note: mouseMove handler is attached to document so it will still function
       // when the user drags quickly and leaves the bounds of the element.

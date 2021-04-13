@@ -43,12 +43,16 @@ export function addEvent(el: Node, event: string, handler: Function, inputOption
   if (!el) return;
   const options = {capture: true, ...inputOptions};
   if (el.addEventListener) {
+    // @ts-ignore
     el.addEventListener(event, handler, options);
-  } else if (el.attachEvent) {
-    el.attachEvent('on' + event, handler);
-  } else {
-    // $FlowIgnore: Doesn't think elements are indexable
-    el['on' + event] = handler;
+  } else { // @ts-ignore
+    if (el.attachEvent) {
+        // @ts-ignore
+      el.attachEvent('on' + event, handler);
+      } else {
+        // $FlowIgnore: Doesn't think elements are indexable
+        el['on' + event] = handler;
+      }
   }
 }
 
@@ -56,12 +60,16 @@ export function removeEvent(el: Node, event: string, handler: Function, inputOpt
   if (!el) return;
   const options = {capture: true, ...inputOptions};
   if (el.removeEventListener) {
+    // @ts-ignore
     el.removeEventListener(event, handler, options);
-  } else if (el.detachEvent) {
-    el.detachEvent('on' + event, handler);
-  } else {
-    // $FlowIgnore: Doesn't think elements are indexable
-    el['on' + event] = null;
+  } else { // @ts-ignore
+    if (el.detachEvent) {
+        // @ts-ignore
+      el.detachEvent('on' + event, handler);
+      } else {
+        // $FlowIgnore: Doesn't think elements are indexable
+        el['on' + event] = null;
+      }
   }
 }
 
@@ -150,6 +158,7 @@ export function addUserSelectStyles(doc: Document) {
   let styleEl = doc.getElementById('react-draggable-style-el');
   if (!styleEl) {
     styleEl = doc.createElement('style');
+    // @ts-ignore
     styleEl.type = 'text/css';
     styleEl.id = 'react-draggable-style-el';
     styleEl.innerHTML = '.react-draggable-transparent-selection *::-moz-selection {all: inherit;}\n';
@@ -163,9 +172,9 @@ export function removeUserSelectStyles(doc: Document) {
   if (!doc) return;
   try {
     if (doc.body) removeClassName(doc.body, 'react-draggable-transparent-selection');
-    // $FlowIgnore: IE
+    // @ts-ignore
     if (doc.selection) {
-      // $FlowIgnore: IE
+      // @ts-ignore
       doc.selection.empty();
     } else {
       // Remove selection caused by scroll, unless it's a focused input

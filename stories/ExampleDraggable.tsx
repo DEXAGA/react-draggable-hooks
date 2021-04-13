@@ -91,7 +91,7 @@ const ExampleDraggable = (props) => {
     onStop();
   };
 
-    const dragHandlers = {onStart: onStart, onStop: onStop};
+    const dragHandlers: any = {onStart: onStart, onStop: onStop};
     const {deltaPosition, controlledPosition} = state;
     return (
       <div>
